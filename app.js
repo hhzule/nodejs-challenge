@@ -2,7 +2,8 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
-
+require('dotenv').config();
+const { paymentLimiter, orderLimiter } = require("./middlewares/rateLimiter");
 const orderRouter = require('./routes/orderRoute');
 const paymentRouter = require('./routes/paymentRoute');
 const productRouter = require('./routes/productRoute');
@@ -29,8 +30,8 @@ app.use(cookieParser());
 
 
 app.use('/api/payment', paymentRouter);
-app.use('/api/order', orderRouter);
-app.use('/api/product', productRouter);
+app.use('/api/order',orderLimiter, orderRouter);
+app.use('/api/product',paymentLimiter, productRouter);
 app.use('/api/user', userRouter);
 
 app.get('/', (req, res) => {
